@@ -131,3 +131,23 @@ impl GameBoard {
         strs.join("\n")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::GameBoard;
+
+    #[test]
+    fn test_populate_black_holes() {
+        let dim = 10usize;
+        let mut board = GameBoard::new(dim);
+        let holes = 15;
+        board.populate_black_holes(holes);
+        let mut count = 0usize;
+        for i in 0..dim {
+            for j in 0..dim {
+                count += if board.cells[i][j].is_safe { 0 } else { 1 };
+            }
+        }
+        assert_eq!(count, holes, "Wrong holes count");
+    }
+}
