@@ -26,14 +26,15 @@ fn main() {
             let col: isize = pos_str[1].parse().unwrap_or(-1);
             if row >= 0 && col >= 0 {
                 is_correct = true;
-                if !board.try_open(row as usize, col as usize) {
+                board.try_open(row as usize, col as usize);
+                if board.is_game_over() {
                     println!("The mine is here. Game over");
                     break;
                 }
             }
         }
         if !is_correct {
-            println!("Incorrent input, try again");
+            println!("Incorrect input, try again");
         }
     }
 }

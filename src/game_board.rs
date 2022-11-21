@@ -7,12 +7,14 @@ struct GameCell {
 
 pub struct GameBoard {
     cells: Vec<Vec<GameCell>>,
+    is_game_over: bool,
 }
 
 impl GameBoard {
     pub fn new(dimension: usize) -> Self {
         Self {
             cells: Self::default_cells(dimension),
+            is_game_over: false,
         }
     }
 
@@ -27,7 +29,14 @@ impl GameBoard {
         }).collect()
     }
 
+    pub fn is_game_over(&self) -> bool {
+        self.is_game_over
+    }
+
     pub fn populate_black_holes(&mut self, amount: usize) {
+        if self.is_game_over {
+            return;
+        }
         let mut rng = rand::thread_rng();
         let dim = self.cells.len();
         let mut counter = amount;
@@ -80,15 +89,18 @@ impl GameBoard {
         self.cells[row][col].is_visible
     }
 
-    pub fn try_open(&mut self, row: usize, col: usize) -> bool {
+    pub fn try_open(&mut self, row: usize, col: usize) {
+        if self.is_game_over {
+            return;
+        }
         if let Some(number) = self.get_black_holes_count(row, col) {
             if number > 0 {
                 self.cells[row][col].is_visible = true;
-                return true;
+                return;
             }
         } else {
-            // game over
-            return false;
+            self.is_game_over = true;
+            return;
         }
         let mut positions = vec![(row, col)];
         while positions.len() > 0 {
@@ -108,7 +120,6 @@ impl GameBoard {
                 }
             }
         }
-        true
     }
 
     pub fn formatted(&self, ignore_hidden: bool) -> String {
@@ -137,7 +148,7 @@ mod tests {
     use super::GameBoard;
 
     #[test]
-    fn test_populate_black_holes() {
+    fn board_populate_black_holes() {
         let dim = 10usize;
         let mut board = GameBoard::new(dim);
         let holes = 15;
@@ -149,5 +160,22 @@ mod tests {
             }
         }
         assert_eq!(count, holes, "Wrong holes count");
+    }
+
+    #[test]
+    fn board_game_over() {
+        let dim = 10usize;
+        let mut board = GameBoard::new(dim);
+        assert!(!board.is_game_over, "Wrong initial state");
+        'l: for i in 0..dim {
+            for j in 0..dim {
+                if board.cells[i][j].is_safe {
+                    continue;
+                }
+                board.try_open(i, j);
+                break 'l;
+            }
+        }
+        assert!(!board.is_game_over, "Game over flag did not properly");
     }
 }
