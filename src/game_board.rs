@@ -1,6 +1,6 @@
 use rand::Rng;
 
-struct GameCell {
+struct Cell {
     is_visible: bool,
     is_safe: bool,
     is_flagged: bool,
@@ -14,7 +14,7 @@ enum State {
 }
 
 pub struct GameBoard {
-    cells: Vec<Vec<GameCell>>,
+    cells: Vec<Vec<Cell>>,
     state: State,
 }
 
@@ -26,12 +26,12 @@ impl GameBoard {
         }
     }
 
-    fn default_cells(dim: usize) -> Vec<Vec<GameCell>> {
+    fn default_cells(dim: usize) -> Vec<Vec<Cell>> {
         (0..dim)
             .map({
                 |_| {
                     (0..dim)
-                        .map(|_| GameCell {
+                        .map(|_| Cell {
                             is_visible: false,
                             is_safe: true,
                             is_flagged: false,
