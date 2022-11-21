@@ -144,7 +144,17 @@ impl GameBoard {
 
     pub fn put_flag(&mut self, row: usize, col: usize) {
         self.cells[row][col].is_flagged = !self.cells[row][col].is_flagged;
-        todo!("Check is won")
+        for i in 0..self.cells.len() {
+            for j in 0..self.cells[i].len() {
+                let cell = &self.cells[i][j];
+                if cell.is_safe {
+                    if cell.is_flagged { return; }
+                } else if !cell.is_flagged {
+                    return;
+                }
+            }
+        }
+        self.state = State::Won;
     }
 
     pub fn formatted(&self, ignore_hidden: bool) -> String {
@@ -190,7 +200,7 @@ mod tests {
     }
 
     #[test]
-    fn board_game_over() {
+    fn board_lose() {
         let dim = 10usize;
         let mut board = GameBoard::new(dim);
         board.populate_black_holes(10);
@@ -206,6 +216,31 @@ mod tests {
         assert_eq!(
             board.state,
             State::Lose,
+            "Game state wasn't changed properly"
+        );
+        assert!(board.is_game_over(), "Game over flag did not properly");
+    }
+
+    #[test]
+    fn board_win() {
+        let dim = 10usize;
+        let mut board = GameBoard::new(dim);
+        let mut flags = 10;
+        board.populate_black_holes(flags);
+        for i in 0..dim {
+            for j in 0..dim {
+                if !board.cells[i][j].is_safe {
+                    board.put_flag(i, j);
+                    flags -= 1;
+                    if flags > 0 {
+                        assert_eq!(board.state, State::Continues, "Game state changed incorrectly");
+                    }
+                }
+            }
+        }
+        assert_eq!(
+            board.state,
+            State::Won,
             "Game state wasn't changed properly"
         );
         assert!(board.is_game_over(), "Game over flag did not properly");
