@@ -143,6 +143,7 @@ impl GameBoard {
     }
 
     pub fn put_flag(&mut self, row: usize, col: usize) {
+        if self.is_game_over() { return; }
         self.cells[row][col].is_flagged = !self.cells[row][col].is_flagged;
         for i in 0..self.cells.len() {
             for j in 0..self.cells[i].len() {
