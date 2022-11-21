@@ -26,9 +26,13 @@ fn main() {
             let col: isize = pos_str[1].parse().unwrap_or(-1);
             if row >= 0 && col >= 0 {
                 is_correct = true;
-                board.try_open(row as usize, col as usize);
+                board.open(row as usize, col as usize);
                 if board.is_game_over() {
-                    println!("The mine is here. Game over");
+                    if board.is_won() {
+                        println!("The mine is here. Game over");
+                    } else {
+                        println!("You won. Game over");
+                    }
                     break;
                 }
             }
