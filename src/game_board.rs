@@ -143,13 +143,17 @@ impl GameBoard {
     }
 
     pub fn put_flag(&mut self, row: usize, col: usize) {
-        if self.is_game_over() { return; }
+        if self.is_game_over() {
+            return;
+        }
         self.cells[row][col].is_flagged = !self.cells[row][col].is_flagged;
         for i in 0..self.cells.len() {
             for j in 0..self.cells[i].len() {
                 let cell = &self.cells[i][j];
                 if cell.is_safe {
-                    if cell.is_flagged { return; }
+                    if cell.is_flagged {
+                        return;
+                    }
                 } else if !cell.is_flagged {
                     return;
                 }
@@ -234,7 +238,11 @@ mod tests {
                     board.put_flag(i, j);
                     flags -= 1;
                     if flags > 0 {
-                        assert_eq!(board.state, State::Continues, "Game state changed incorrectly");
+                        assert_eq!(
+                            board.state,
+                            State::Continues,
+                            "Game state changed incorrectly"
+                        );
                     }
                 }
             }
