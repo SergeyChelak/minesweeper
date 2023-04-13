@@ -1,6 +1,5 @@
 use sdl2::{render::WindowCanvas, video::Window};
 use sdl2::pixels::Color;
-use std::time::Duration;
 
 pub struct Renderer {
     canvas: WindowCanvas,
@@ -17,7 +16,6 @@ impl Renderer {
         self.canvas.clear();
         // TODO: draw code
         self.canvas.present();
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 30));
         Ok(())
     }
 }
