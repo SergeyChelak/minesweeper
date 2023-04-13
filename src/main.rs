@@ -1,28 +1,20 @@
 extern crate sdl2;
 
-mod model;
+mod game_context;
+mod renderer;
 
+use renderer::Renderer;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::pixels::Color;
-use std::time::Duration;
+use sdl2::video::Window;
+use sdl2::Sdl;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
-    let video_subsystem = sdl_context.video()?;
+    let window = setup_window(&sdl_context)?;
+    let mut renderer = Renderer::with_window(window)?;
 
-    let window = video_subsystem
-        .window("Minesweeper", 800, 600)
-        .position_centered()
-        .opengl()
-        .build()
-        .map_err(|e| e.to_string())?;
-
-    let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
-
-    canvas.set_draw_color(Color::RGB(255, 0, 0));
     let mut event_pump = sdl_context.event_pump()?;
-
     'running: loop {
         for event in event_pump.poll_iter() {
             match event {
@@ -34,11 +26,17 @@ fn main() -> Result<(), String> {
                 _ => {}
             }
         }
-
-        canvas.clear();
-        canvas.present();
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 30));
-        // The rest of the game loop goes here...
+        renderer.draw()?;
     }
     Ok(())
+}
+
+fn setup_window(sdl_context: &Sdl) -> Result<Window, String> {
+    sdl_context
+        .video()?
+        .window("Minesweeper", 800, 600)
+        .position_centered()
+        .opengl()
+        .build()
+        .map_err(|e| e.to_string())
 }
