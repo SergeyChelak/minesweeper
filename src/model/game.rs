@@ -1,7 +1,7 @@
 use rand::Rng;
 use std::time::Instant;
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug)]
 enum State {
     InProgress,
     Win,
@@ -132,7 +132,7 @@ impl Game {
     }
 
     pub fn open_cell(&mut self, row: usize, col: usize) {
-        if self.can_touch_cell(row, col) {
+        if !self.can_touch_cell(row, col) {
             return;
         }
         let current = &mut self.board[row][col];
@@ -169,7 +169,7 @@ impl Game {
     }
 
     pub fn flag_cell(&mut self, row: usize, col: usize) {
-        if self.can_touch_cell(row, col) {
+        if !self.can_touch_cell(row, col) {
             return;
         }
         self.board[row][col].is_flagged = !self.board[row][col].is_flagged;
@@ -212,17 +212,35 @@ impl Game {
 mod tests {
     use super::*;
 
-    #[test]
-    fn model_fill_mines() {
+    fn create_game() -> Game {
         let mut game = Game::new();
         let mines = 10;
         game.start(9, 9, mines);
+        game
+    }
 
+    #[test]
+    fn model_fill_mines() {
+        let game = create_game();
         let found = game.board.iter()
             .map(|row| {
                 row.iter().filter(|cell| !cell.is_safe).count()
             })
             .sum::<usize>();
-        assert_eq!(found, mines);
+        assert_eq!(found, game.mines);
+    }
+
+    #[test]
+    fn model_lose() {
+        let mut game = create_game();
+        'outer: for r in 0..game.row_count {
+            for c in 0..game.col_count {
+                if !game.board[r][c].is_safe {
+                    game.open_cell(r, c);
+                    break 'outer
+                }
+            }
+        }
+        assert_eq!(game.state, State::Lose);
     }
 }
