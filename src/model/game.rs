@@ -214,8 +214,8 @@ mod tests {
 
     fn create_game() -> Game {
         let mut game = Game::new();
-        let mines = 10;
-        game.start(9, 9, mines);
+        let mines = 99;
+        game.start(16, 32, mines);
         game
     }
 
@@ -265,6 +265,19 @@ mod tests {
                 if !game.board[r][c].is_safe {
                     game.flag_cell(r, c);
                 }
+            }
+        }
+        assert_eq!(game.state, State::Win);
+    }
+
+    #[test]
+    fn model_open_cell_empty_board() {
+        let mut game = Game::new();
+        game.start(16, 32, 0);
+        game.open_cell(0, 0);
+        for r in 0..game.row_count {
+            for c in 0..game.col_count {
+                assert!(game.board[r][c].is_visible);
             }
         }
         assert_eq!(game.state, State::Win);
