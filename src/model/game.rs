@@ -73,6 +73,9 @@ impl Game {
     }
 
     fn start(&mut self, rows: usize, cols: usize, mines: usize) {
+        if mines >= rows * cols {
+            return;
+        }
         self.row_count = rows;
         self.col_count = cols;
         self.mines = mines;
@@ -222,10 +225,10 @@ mod tests {
     #[test]
     fn model_fill_mines() {
         let game = create_game();
-        let found = game.board.iter()
-            .map(|row| {
-                row.iter().filter(|cell| !cell.is_safe).count()
-            })
+        let found = game
+            .board
+            .iter()
+            .map(|row| row.iter().filter(|cell| !cell.is_safe).count())
             .sum::<usize>();
         assert_eq!(found, game.mines);
     }
@@ -237,7 +240,7 @@ mod tests {
             for c in 0..game.col_count {
                 if !game.board[r][c].is_safe {
                     game.open_cell(r, c);
-                    break 'outer
+                    break 'outer;
                 }
             }
         }
