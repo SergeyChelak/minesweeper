@@ -72,7 +72,7 @@ impl GameContext {
         }
     }
 
-    fn start(&mut self, rows: usize, cols: usize, mines: usize) {
+    pub fn start(&mut self, rows: usize, cols: usize, mines: usize) {
         if mines >= rows * cols {
             return;
         }
@@ -84,6 +84,10 @@ impl GameContext {
         self.board = vec![vec![Cell::new(); self.col_count]; self.row_count];
         self.fill_mines();
         self.fill_safe_numbers();
+    }
+
+    pub fn restart(&mut self) {
+        self.start(self.row_count, self.col_count, self.mines);
     }
 
     fn fill_mines(&mut self) {
