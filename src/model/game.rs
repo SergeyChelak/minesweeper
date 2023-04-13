@@ -243,4 +243,30 @@ mod tests {
         }
         assert_eq!(game.state, State::Lose);
     }
+
+    #[test]
+    fn model_win_by_open() {
+        let mut game = create_game();
+        for r in 0..game.row_count {
+            for c in 0..game.col_count {
+                if game.board[r][c].is_safe {
+                    game.open_cell(r, c);
+                }
+            }
+        }
+        assert_eq!(game.state, State::Win);
+    }
+
+    #[test]
+    fn model_win_by_flag() {
+        let mut game = create_game();
+        for r in 0..game.row_count {
+            for c in 0..game.col_count {
+                if !game.board[r][c].is_safe {
+                    game.flag_cell(r, c);
+                }
+            }
+        }
+        assert_eq!(game.state, State::Win);
+    }
 }
