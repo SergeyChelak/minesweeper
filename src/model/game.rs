@@ -207,3 +207,22 @@ impl Game {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn model_fill_mines() {
+        let mut game = Game::new();
+        let mines = 10;
+        game.start(9, 9, mines);
+
+        let found = game.board.iter()
+            .map(|row| {
+                row.iter().filter(|cell| !cell.is_safe).count()
+            })
+            .sum::<usize>();
+        assert_eq!(found, mines);
+    }
+}
