@@ -1,15 +1,15 @@
 use rand::Rng;
 use std::time::Instant;
 
-#[derive(PartialEq, Eq, Debug)]
-enum State {
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub enum State {
     InProgress,
     Win,
     Lose,
 }
 
 #[derive(Clone, Copy)]
-struct Cell {
+pub struct Cell {
     is_visible: bool,
     is_safe: bool,
     is_flagged: bool,
@@ -24,6 +24,22 @@ impl Cell {
             is_flagged: false,
             mines_count: 0,
         }
+    }
+
+    pub fn is_visible(&self) -> bool {
+        self.is_visible
+    }
+
+    pub fn is_safe(&self) -> bool {
+        self.is_safe
+    }
+
+    pub fn is_flagged(&self) -> bool {
+        self.is_flagged
+    }
+
+    pub fn mines_count(&self) -> usize {
+        self.mines_count
     }
 }
 
@@ -51,7 +67,7 @@ impl Op {
     }
 }
 
-struct GameContext {
+pub struct GameContext {
     board: Vec<Vec<Cell>>,
     state: State,
     mines: usize,
@@ -212,6 +228,18 @@ impl GameContext {
         if is_flag_win || is_open_win {
             self.state = State::Win;
         }
+    }
+
+    pub fn state(&self) -> State {
+        self.state
+    }
+
+    pub fn board_size(&self) -> (usize, usize) {
+        (self.row_count, self.col_count)
+    }
+
+    pub fn get_cell(&self, row: usize, col: usize) -> Cell {
+        self.board[row][col]
     }
 }
 
