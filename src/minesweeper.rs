@@ -37,7 +37,7 @@ impl<'a> Minesweeper<'a> {
             font_manager,
             color_manager,
             event_pump,
-            target_fps: 15,
+            target_fps: 5,
             is_running: false,
         }
     }
@@ -45,9 +45,12 @@ impl<'a> Minesweeper<'a> {
     pub fn run(&mut self) -> Result<(), String> {
         let target_frame_duration = Duration::from_millis(1000u64 / self.target_fps);
         self.is_running = true;
-        while self.is_running {
+        loop {
             let frame_start_time = Instant::now();
             self.handle_events();
+            if !self.is_running {
+                break;
+            }
             self.draw()?;
             let elapsed_time = frame_start_time.elapsed();
             let sleep_time = target_frame_duration.saturating_sub(elapsed_time);
