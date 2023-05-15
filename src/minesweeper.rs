@@ -126,13 +126,13 @@ impl<'a> Minesweeper<'a> {
     }
 
     fn draw_board(&mut self) -> Result<(), String> {
-        let is_debug = false;
+        let is_lose = self.model.state() == State::Lose;
 
         let (rows, cols) = self.model.board_size();
         for col in 0..cols {
             for row in 0..rows {
                 let cell = self.model.get_cell(row, col);
-                let texture = if !is_debug && !cell.is_visible() {
+                let texture = if !is_lose && !cell.is_visible() {
                     self.texture_manager.img_unknown()
                 } else if cell.is_flagged() {
                     self.texture_manager.img_flag()
