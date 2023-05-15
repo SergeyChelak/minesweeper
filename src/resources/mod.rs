@@ -6,3 +6,6 @@ pub use textures::*;
 
 mod fonts;
 pub use fonts::*;
+
+mod colors;
+pub use colors::*;

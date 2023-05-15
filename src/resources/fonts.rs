@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use sdl2::ttf::Font;
 
-use super::{FontManager, FontDetails};
+use super::{FontDetails, FontManager};
 
 type FontLoadResult<'a> = Result<Rc<Font<'a, 'static>>, String>;
 

@@ -67,7 +67,7 @@ impl Op {
     }
 }
 
-pub struct GameContext {
+pub struct GameModel {
     board: Vec<Vec<Cell>>,
     state: State,
     mines: usize,
@@ -76,7 +76,7 @@ pub struct GameContext {
     start_time: Instant,
 }
 
-impl GameContext {
+impl GameModel {
     pub fn new() -> Self {
         Self {
             board: vec![],
@@ -247,8 +247,8 @@ impl GameContext {
 mod tests {
     use super::*;
 
-    fn create_game() -> GameContext {
-        let mut game = GameContext::new();
+    fn create_game() -> GameModel {
+        let mut game = GameModel::new();
         let mines = 99;
         game.start(16, 32, mines);
         game
@@ -307,7 +307,7 @@ mod tests {
 
     #[test]
     fn model_open_cell_empty_board() {
-        let mut game = GameContext::new();
+        let mut game = GameModel::new();
         game.start(16, 32, 0);
         game.open_cell(0, 0);
         for r in 0..game.row_count {
