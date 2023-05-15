@@ -25,6 +25,8 @@ pub struct Minesweeper<'a> {
     is_running: bool,
     cell_height: u32,
     cell_width: u32,
+    prev_mouse_buttons: HashSet<MouseButton>,
+
 }
 
 impl<'a> Minesweeper<'a> {
@@ -45,10 +47,11 @@ impl<'a> Minesweeper<'a> {
             font_manager,
             color_manager,
             event_pump,
-            target_fps: 5,
+            target_fps: 20,
             is_running: false,
             cell_height: 64,
             cell_width: 64,
+            prev_mouse_buttons: HashSet::new(),
         }
     }
 
@@ -93,10 +96,21 @@ impl<'a> Minesweeper<'a> {
         let buttons = state
             .pressed_mouse_buttons()
             .collect::<HashSet<MouseButton>>();
-        if !buttons.is_empty() {
+        if buttons.is_empty() && self.prev_mouse_buttons.len() == 1 {
             let (x, y) = (state.x(), state.y());
-            println!("Tap at {x}, {y}");
+            if x >= 0 && y >= 0 {
+                let (x, y) = (x as u32, y as u32);
+                let row = (y / self.cell_width) as usize;
+                let col = (x / self.cell_height) as usize;
+                // println!("Tap at col = {col}, row = {row}");
+                if self.prev_mouse_buttons.contains(&MouseButton::Left) {
+                    self.model.open_cell(row, col);
+                } else if self.prev_mouse_buttons.contains(&MouseButton::Right) {
+                    self.model.flag_cell(row, col);
+                }
+            }
         }
+        self.prev_mouse_buttons = buttons;
     }
 
     pub fn draw(&mut self) -> Result<(), String> {
@@ -112,7 +126,7 @@ impl<'a> Minesweeper<'a> {
     }
 
     fn draw_board(&mut self) -> Result<(), String> {
-        let is_debug = true;
+        let is_debug = false;
 
         let (rows, cols) = self.model.board_size();
         for col in 0..cols {
