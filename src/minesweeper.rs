@@ -34,6 +34,7 @@ pub struct Minesweeper<'a> {
 }
 
 impl<'a> Minesweeper<'a> {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         model: GameModel,
         canvas: WindowCanvas,
@@ -167,28 +168,20 @@ impl<'a> Minesweeper<'a> {
 
     fn draw_win(&mut self) -> Result<(), String> {
         self.draw_board()?;
-        let bounds = Size {
-            height: 150, 
-            width: 650
-        };
-        self.show_message("You win", bounds)
+        self.show_message("You win")
     }
 
     fn draw_lose(&mut self) -> Result<(), String> {
         self.draw_board()?;
-        let bounds = Size {
-            height: 150, 
-            width: 650
-        };
-        self.show_message("Game Over", bounds)
+        self.show_message("Game Over")
     }
 
-    fn show_message(&mut self, text: &str, size: Size) -> Result<(), String> {
+    fn show_message(&mut self, text: &str) -> Result<(), String> {
         let (w, h) = (self.window_size.width, self.window_size.height);
 
         self.canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
         self.canvas.set_draw_color(self.color_manager.fade());
-        self.canvas.fill_rect(Rect::new(0, 0, w, h))?;    
+        self.canvas.fill_rect(Rect::new(0, 0, w, h))?;
 
         self.canvas.set_blend_mode(sdl2::render::BlendMode::None);
 
@@ -202,6 +195,10 @@ impl<'a> Minesweeper<'a> {
             .create_texture_from_surface(&surface)
             .map_err(|e| e.to_string())?;
 
+        let size = Size {
+            height: 150,
+            width: 650,
+        };
         let x = (w - size.width) / 2;
         let y = (h - size.height) / 2;
         let frame = Rect::new(x as i32, y as i32, size.width, size.height);
