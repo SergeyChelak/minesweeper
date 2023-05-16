@@ -13,8 +13,8 @@ pub trait FontProvider<'a> {
 impl<'a> FontProvider<'a> for FontManager<'a> {
     fn font_header(&mut self) -> FontLoadResult<'a> {
         self.load(&FontDetails {
-            path: "assets/fonts/orange juice 2.0.ttf".to_string(),
-            size: 128,
+            path: "assets/fonts/Freedom-10eM.ttf".to_string(),
+            size: 170,
         })
     }
 }

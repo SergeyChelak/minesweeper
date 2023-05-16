@@ -119,7 +119,6 @@ impl<'a> Minesweeper<'a> {
     }
 
     pub fn draw(&mut self) -> Result<(), String> {
-        self.canvas.set_draw_color(self.color_manager.background());
         self.canvas.clear();
         match self.model.state() {
             State::InProgress => self.draw_board(),
@@ -168,15 +167,31 @@ impl<'a> Minesweeper<'a> {
 
     fn draw_win(&mut self) -> Result<(), String> {
         self.draw_board()?;
-        self.show_message("You win")
+        let bounds = Size {
+            height: 150, 
+            width: 650
+        };
+        self.show_message("You win", bounds)
     }
 
     fn draw_lose(&mut self) -> Result<(), String> {
         self.draw_board()?;
-        self.show_message("You lose")
+        let bounds = Size {
+            height: 150, 
+            width: 650
+        };
+        self.show_message("Game Over", bounds)
     }
 
-    fn show_message(&mut self, text: &str) -> Result<(), String> {
+    fn show_message(&mut self, text: &str, size: Size) -> Result<(), String> {
+        let (w, h) = (self.window_size.width, self.window_size.height);
+
+        self.canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
+        self.canvas.set_draw_color(self.color_manager.fade());
+        self.canvas.fill_rect(Rect::new(0, 0, w, h))?;    
+
+        self.canvas.set_blend_mode(sdl2::render::BlendMode::None);
+
         let font = self.font_manager.font_header()?;
         let surface = font
             .render(text)
@@ -186,8 +201,10 @@ impl<'a> Minesweeper<'a> {
             .texture_creator
             .create_texture_from_surface(&surface)
             .map_err(|e| e.to_string())?;
-        let texture_target = Rect::new(130, 20, 650, 150);
-        self.canvas.copy(&texture, None, Some(texture_target))?;
-        Ok(())
+
+        let x = (w - size.width) / 2;
+        let y = (h - size.height) / 2;
+        let frame = Rect::new(x as i32, y as i32, size.width, size.height);
+        self.canvas.copy(&texture, None, Some(frame))
     }
 }
