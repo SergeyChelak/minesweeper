@@ -35,7 +35,7 @@ fn main() -> Result<(), String> {
 
     let texture_creator = canvas.texture_creator();
     let texture_manager = resources::TextureManager::new(&texture_creator);
-    
+
     let event_pump = sdl_context.event_pump()?;
 
     let color_manager = ColorManager;

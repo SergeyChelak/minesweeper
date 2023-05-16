@@ -5,8 +5,8 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
 use sdl2::rect::{Point, Rect};
-use sdl2::render::TextureCreator;
 use sdl2::render::WindowCanvas;
+use sdl2::render::TextureCreator;
 use sdl2::video::WindowContext;
 use sdl2::EventPump;
 
@@ -26,7 +26,6 @@ pub struct Minesweeper<'a> {
     cell_height: u32,
     cell_width: u32,
     prev_mouse_buttons: HashSet<MouseButton>,
-
 }
 
 impl<'a> Minesweeper<'a> {
@@ -47,7 +46,7 @@ impl<'a> Minesweeper<'a> {
             font_manager,
             color_manager,
             event_pump,
-            target_fps: 20,
+            target_fps: 24,
             is_running: false,
             cell_height: 64,
             cell_width: 64,
@@ -127,22 +126,21 @@ impl<'a> Minesweeper<'a> {
 
     fn draw_board(&mut self) -> Result<(), String> {
         let is_lose = self.model.state() == State::Lose;
-
         let (rows, cols) = self.model.board_size();
         for col in 0..cols {
             for row in 0..rows {
                 let cell = self.model.get_cell(row, col);
-                let texture = if !is_lose && !cell.is_visible() {
-                    self.texture_manager.img_unknown()
+                let texture = if !cell.is_safe() && is_lose {
+                    self.texture_manager.img_bomb()
                 } else if cell.is_flagged() {
                     self.texture_manager.img_flag()
-                } else if cell.is_safe() {
+                } else if cell.is_visible() {
                     match cell.mines_count() {
                         0 => self.texture_manager.img_empty(),
                         count => self.texture_manager.img_number(count),
                     }
                 } else {
-                    self.texture_manager.img_bomb()
+                    self.texture_manager.img_unknown()
                 }?;
                 let src = Rect::new(0, 0, self.cell_width, self.cell_height);
                 let w = self.cell_width as i32;

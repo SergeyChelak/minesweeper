@@ -159,6 +159,7 @@ impl GameModel {
             return;
         }
         let current = &mut self.board[row][col];
+        current.is_flagged = false;
         if current.is_safe {
             if current.mines_count > 0 {
                 current.is_visible = true;
