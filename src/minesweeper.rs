@@ -5,13 +5,18 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
 use sdl2::rect::{Point, Rect};
-use sdl2::render::WindowCanvas;
 use sdl2::render::TextureCreator;
+use sdl2::render::WindowCanvas;
 use sdl2::video::WindowContext;
 use sdl2::EventPump;
 
 use crate::game_model::*;
 use crate::resources::{ColorManager, FontManager, FontProvider, TextureManager, TextureProvider};
+
+pub struct Size {
+    pub height: u32,
+    pub width: u32,
+}
 
 pub struct Minesweeper<'a> {
     model: GameModel,
@@ -23,8 +28,8 @@ pub struct Minesweeper<'a> {
     event_pump: EventPump,
     target_fps: u64,
     is_running: bool,
-    cell_height: u32,
-    cell_width: u32,
+    cell_size: Size,
+    window_size: Size,
     prev_mouse_buttons: HashSet<MouseButton>,
 }
 
@@ -37,6 +42,8 @@ impl<'a> Minesweeper<'a> {
         font_manager: FontManager<'a>,
         color_manager: ColorManager,
         event_pump: EventPump,
+        cell_size: Size,
+        window_size: Size,
     ) -> Self {
         Self {
             model,
@@ -48,8 +55,8 @@ impl<'a> Minesweeper<'a> {
             event_pump,
             target_fps: 24,
             is_running: false,
-            cell_height: 64,
-            cell_width: 64,
+            cell_size,
+            window_size,
             prev_mouse_buttons: HashSet::new(),
         }
     }
@@ -99,9 +106,8 @@ impl<'a> Minesweeper<'a> {
             let (x, y) = (state.x(), state.y());
             if x >= 0 && y >= 0 {
                 let (x, y) = (x as u32, y as u32);
-                let row = (y / self.cell_width) as usize;
-                let col = (x / self.cell_height) as usize;
-                // println!("Tap at col = {col}, row = {row}");
+                let row = (y / self.cell_size.width) as usize;
+                let col = (x / self.cell_size.height) as usize;
                 if self.prev_mouse_buttons.contains(&MouseButton::Left) {
                     self.model.open_cell(row, col);
                 } else if self.prev_mouse_buttons.contains(&MouseButton::Right) {
@@ -146,16 +152,13 @@ impl<'a> Minesweeper<'a> {
                 } else {
                     self.texture_manager.img_unknown()
                 }?;
-                let src = Rect::new(0, 0, self.cell_width, self.cell_height);
-                let w = self.cell_width as i32;
-                let h = self.cell_height as i32;
+                let cell_width = self.cell_size.width;
+                let cell_height = self.cell_size.height;
+                let src = Rect::new(0, 0, cell_width, cell_height);
+                let w = cell_width as i32;
+                let h = cell_height as i32;
                 let center = Point::new(w / 2, h / 2);
-                let dest = Rect::new(
-                    col as i32 * w,
-                    row as i32 * w,
-                    self.cell_width,
-                    self.cell_height,
-                );
+                let dest = Rect::new(col as i32 * w, row as i32 * w, cell_width, cell_height);
                 self.canvas
                     .copy_ex(&texture, src, dest, 0.0, center, false, false)?;
             }

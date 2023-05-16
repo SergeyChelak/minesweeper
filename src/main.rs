@@ -7,7 +7,7 @@ mod resources;
 use resources::*;
 
 mod minesweeper;
-use minesweeper::Minesweeper;
+use minesweeper::{Minesweeper, Size};
 
 mod config;
 use config::Configuration;
@@ -19,12 +19,22 @@ fn main() -> Result<(), String> {
     game_model.start(config.row_count(), config.col_count(), config.mines_count());
 
     // sdl setup
-    let window_height = 64 * config.row_count() as u32;
-    let window_width = 64 * config.col_count() as u32;
+    let cell_size = Size {
+        height: 64,
+        width: 64,
+    };
+    let window_size = Size {
+        height: cell_size.height * config.row_count() as u32,
+        width: cell_size.width * config.col_count() as u32,
+    };
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
     let window = video_subsystem
-        .window(&config.window_title(), window_width, window_height)
+        .window(
+            &config.window_title(),
+            window_size.width,
+            window_size.height,
+        )
         .position_centered()
         .build()
         .map_err(|e| e.to_string())?;
@@ -50,6 +60,8 @@ fn main() -> Result<(), String> {
         font_manager,
         color_manager,
         event_pump,
+        cell_size,
+        window_size,
     );
     minesweeper.run()
 }

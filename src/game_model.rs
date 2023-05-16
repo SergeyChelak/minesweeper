@@ -74,7 +74,10 @@ pub struct BoardCoordinate {
 
 impl BoardCoordinate {
     fn fake() -> Self {
-        Self { row: usize::MAX, col: usize::MAX }
+        Self {
+            row: usize::MAX,
+            col: usize::MAX,
+        }
     }
 }
 
@@ -172,9 +175,7 @@ impl GameModel {
         if !self.can_touch_cell(row, col) {
             return;
         }
-        self.last_step = BoardCoordinate {
-            row, col
-        };
+        self.last_step = BoardCoordinate { row, col };
         let current = &mut self.board[row][col];
         current.is_flagged = false;
         if current.is_safe {
