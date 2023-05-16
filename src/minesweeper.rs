@@ -131,7 +131,11 @@ impl<'a> Minesweeper<'a> {
             for row in 0..rows {
                 let cell = self.model.get_cell(row, col);
                 let texture = if !cell.is_safe() && is_lose {
-                    self.texture_manager.img_bomb()
+                    if self.model.is_last_step(row, col) {
+                        self.texture_manager.img_bomb_exploded()
+                    } else {
+                        self.texture_manager.img_bomb()
+                    }
                 } else if cell.is_flagged() {
                     self.texture_manager.img_flag()
                 } else if cell.is_visible() {

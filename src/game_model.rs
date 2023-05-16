@@ -67,6 +67,17 @@ impl Op {
     }
 }
 
+pub struct BoardCoordinate {
+    row: usize,
+    col: usize,
+}
+
+impl BoardCoordinate {
+    fn fake() -> Self {
+        Self { row: usize::MAX, col: usize::MAX }
+    }
+}
+
 pub struct GameModel {
     board: Vec<Vec<Cell>>,
     state: State,
@@ -74,6 +85,7 @@ pub struct GameModel {
     row_count: usize,
     col_count: usize,
     start_time: Instant,
+    last_step: BoardCoordinate,
 }
 
 impl GameModel {
@@ -85,6 +97,7 @@ impl GameModel {
             row_count: 0,
             col_count: 0,
             start_time: Instant::now(),
+            last_step: BoardCoordinate::fake(),
         }
     }
 
@@ -98,6 +111,7 @@ impl GameModel {
         self.start_time = Instant::now();
         self.state = State::InProgress;
         self.board = vec![vec![Cell::new(); self.col_count]; self.row_count];
+        self.last_step = BoardCoordinate::fake();
         self.fill_mines();
         self.fill_safe_numbers();
     }
@@ -158,6 +172,9 @@ impl GameModel {
         if !self.can_touch_cell(row, col) {
             return;
         }
+        self.last_step = BoardCoordinate {
+            row, col
+        };
         let current = &mut self.board[row][col];
         current.is_flagged = false;
         if current.is_safe {
@@ -241,6 +258,11 @@ impl GameModel {
 
     pub fn get_cell(&self, row: usize, col: usize) -> Cell {
         self.board[row][col]
+    }
+
+    pub fn is_last_step(&self, row: usize, col: usize) -> bool {
+        let last = &self.last_step;
+        last.row == row && last.col == col
     }
 }
 
